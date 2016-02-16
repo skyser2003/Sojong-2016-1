@@ -1,0 +1,3 @@
+[submodule "one_simulator"]
+	path = one_simulator
+	url = https://github.com/skyser2003/the-one
