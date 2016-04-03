@@ -16,8 +16,5 @@ doc/package-list
 /target/
 .settings/org.eclipse.*
 
-# IntelliJ IDE files
-out/
-
 # Binary
 bin/
