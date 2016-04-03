@@ -28,7 +28,6 @@ public class AllSpreadReport extends Report implements UpdateListener {
 		for (DTNHost host : hosts) {
 			if (host.getMessageCollection().size() == 0) {
 				allSpread = false;
-				break;
 			} else {
 				++count;
 			}
