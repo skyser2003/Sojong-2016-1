@@ -8,6 +8,7 @@ import java.util.Random;
 
 import core.Settings;
 import core.SettingsError;
+import core.SimClock;
 
 /**
  * Message creation -external events generator. Creates uniformly distributed
@@ -44,6 +45,7 @@ public class MessageEventGenerator implements EventQueue {
 	 * and after the second value. By default, messages are created for the
 	 * whole simulation time. */
 	public static final String MESSAGE_TIME_S = "time";
+    public static final String STOP_AFTER_WARMUP_S = "stopafterwarmup";
 
 	/** Time of the next event (simulated seconds) */
 	protected double nextEventsTime = 0;
@@ -65,6 +67,9 @@ public class MessageEventGenerator implements EventQueue {
 	/** Random number generator for this Class */
 	protected Random rng;
 
+    /** Stop generating message after warmup */
+    protected boolean stopAfterWarmUp;
+
 	/**
 	 * Constructor, initializes the interval between events,
 	 * and the size of messages generated, as well as number
@@ -76,6 +81,9 @@ public class MessageEventGenerator implements EventQueue {
 		this.msgInterval = s.getCsvInts(MESSAGE_INTERVAL_S);
 		this.hostRange = s.getCsvInts(HOST_RANGE_S, 2);
 		this.idPrefix = s.getSetting(MESSAGE_ID_PREFIX_S);
+        this.stopAfterWarmUp = s.getBoolean(STOP_AFTER_WARMUP_S, false);
+
+        warmupTime = new Settings(report.Report.REPORT_NS).getInt(report.Report.WARMUP_S);
 
 		if (s.contains(MESSAGE_TIME_S)) {
 			this.msgTime = s.getCsvDoubles(MESSAGE_TIME_S, 2);
@@ -154,6 +162,9 @@ public class MessageEventGenerator implements EventQueue {
 		return sizeRange[0] + sizeDiff;
 	}
 
+    boolean warmUpEnd = false;
+    long warmupTime = 0;
+
 	/**
 	 * Generates a (random) time difference between two events
 	 * @return the time difference
@@ -186,6 +197,10 @@ public class MessageEventGenerator implements EventQueue {
 	 * @see input.EventQueue#nextEvent()
 	 */
 	public ExternalEvent nextEvent() {
+        if (warmUpEnd) {
+            return null;
+        }
+
 		int responseSize = 0; /* zero stands for one way messages */
 		int msgSize;
 		int interval;
@@ -198,6 +213,10 @@ public class MessageEventGenerator implements EventQueue {
 
 		msgSize = drawMessageSize();
 		interval = drawNextEventTimeDiff();
+        if (this.stopAfterWarmUp && warmupTime < SimClock.getTime()) {
+            warmUpEnd = true;
+            return null;
+        }
 
 		/* Create event and advance to next event */
 		MessageCreateEvent mce = new MessageCreateEvent(from, to, this.getID(),
@@ -216,7 +235,11 @@ public class MessageEventGenerator implements EventQueue {
 	 * Returns next message creation event's time
 	 * @see input.EventQueue#nextEventsTime()
 	 */
-	public double nextEventsTime() {
+	public double nextEventsTime()
+    {
+        if (warmUpEnd) {
+            return Double.MAX_VALUE;
+        }
 		return this.nextEventsTime;
 	}
 

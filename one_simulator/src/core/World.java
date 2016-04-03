@@ -156,7 +156,9 @@ public class World {
 		while (this.nextQueueEventTime <= runUntil) {
 			simClock.setTime(this.nextQueueEventTime);
 			ExternalEvent ee = this.nextEventQueue.nextEvent();
-			ee.processEvent(this);
+			if (ee != null) {
+				ee.processEvent(this);
+			}
 			updateHosts(); // update all hosts after every event
 			setNextEventQueue();
 		}

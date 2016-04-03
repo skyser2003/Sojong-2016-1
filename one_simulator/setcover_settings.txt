@@ -131,6 +131,7 @@ Events1.size = 500k,1M
 Events1.hosts = 0,125
 # Message ID prefix
 Events1.prefix = M
+Events1.stopafterwarmup = true
 
 ## Movement model settings
 # seed for movement models' pseudo random number generator (default = 0)
