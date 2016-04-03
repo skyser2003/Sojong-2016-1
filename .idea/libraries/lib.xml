@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/one_simulator/lib/DTNConsoleConnection.jar!/" />
+      <root url="jar://$PROJECT_DIR$/one_simulator/lib/ECLA.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
