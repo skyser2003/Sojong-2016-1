@@ -5,6 +5,6 @@ import java.util.ArrayList;
 import routing.SojongRouter;
 
 public class Group {
-	public SojongRouter center = null;
-	public ArrayList<SojongRouter> routerList = new ArrayList();
+	public ArrayList<SojongRouter> centerList = new ArrayList<>();
+	public ArrayList<SojongRouter> routerList = new ArrayList<>();
 }

@@ -16,193 +16,222 @@ import core.SimClock;
 import sojong.Group;
 
 public class SojongRouter extends ActiveRouter {
-	static private ArrayList<Group> groupList = new ArrayList<>();
-	static private ArrayList<SojongRouter> routerList = new ArrayList<>();
+    static private ArrayList<Group> groupList = new ArrayList<>();
+    static private ArrayList<SojongRouter> routerList = new ArrayList<>();
 
-	static int warmupTime = 0;
-	static boolean warmUpEnded = false;
+    static int warmupTime = 0;
+    static boolean warmUpEnded = false;
 
-	private int groupID = -1;
-	private boolean isCenter = false;
+    static boolean onePerGroup = true;
+    static int k = 10;
 
-	private HashMap<DTNHost, Integer> meetCount = new HashMap<>();
+    private int groupID = -1;
+    private boolean isCenter = false;
 
-	static private boolean isWarmUp() {
-		return warmupTime > SimClock.getTime();
-	}
+    private HashMap<DTNHost, Integer> meetCount = new HashMap<>();
 
-	static private void warmUpEnd() {
-		List<SojongRouter> removeList = new ArrayList<>();
+    static private boolean isWarmUp() {
+        return warmupTime > SimClock.getTime();
+    }
 
-		for (SojongRouter router : routerList) {
-			if (router.getHost() == null) {
-				removeList.add(router);
-				continue;
-			}
+    static private void warmUpEnd() {
+        List<SojongRouter> removeList = new ArrayList<>();
 
-			router.clearMessages();
-		}
+        for (SojongRouter router : routerList) {
+            if (router.getHost() == null) {
+                removeList.add(router);
+                continue;
+            }
 
-		for (SojongRouter router : removeList) {
-			routerList.remove(router);
-		}
+            router.clearMessages();
+        }
 
-		for (SojongRouter r1 : routerList) {
-			for (SojongRouter r2 : routerList) {
-				if (r1.meetCount.containsKey(r2.getHost()) == false) {
-					continue;
-				}
-				if (r1.groupID != -1 && r2.groupID != -1) {
-					continue;
-				}
+        for (SojongRouter router : removeList) {
+            routerList.remove(router);
+        }
 
-				int meetShareTargetCount = 0;
+        for (SojongRouter r1 : routerList) {
+            for (SojongRouter r2 : routerList) {
+                if (r1.meetCount.containsKey(r2.getHost()) == false) {
+                    continue;
+                }
+                if (r1.groupID != -1 && r2.groupID != -1) {
+                    continue;
+                }
 
-				for (Entry<DTNHost, Integer> entry : r1.meetCount.entrySet()) {
-					DTNHost host = entry.getKey();
+                int meetShareTargetCount = 0;
 
-					if (host == r2.getHost()) {
-						continue;
-					}
+                for (Entry<DTNHost, Integer> entry : r1.meetCount.entrySet()) {
+                    DTNHost host = entry.getKey();
 
-					if (r2.meetCount.containsKey(host) == true) {
-						++meetShareTargetCount;
-					}
-				}
+                    if (host == r2.getHost()) {
+                        continue;
+                    }
 
-				if (meetShareTargetCount >= 5) {
-					if (r1.groupID == -1 && r2.groupID == -1) {
-						int groupID = groupList.size();
-						groupList.add(new Group());
+                    if (r2.meetCount.containsKey(host) == true) {
+                        ++meetShareTargetCount;
+                    }
+                }
 
-						r1.groupID = groupID;
-						r2.groupID = groupID;
+                if (meetShareTargetCount >= 5) {
+                    if (r1.groupID == -1 && r2.groupID == -1) {
+                        int groupID = groupList.size();
+                        groupList.add(new Group());
 
-						groupList.get(groupID).routerList.add(r1);
-						groupList.get(groupID).routerList.add(r2);
-					} else if (r1.groupID != -1) {
-						int groupID = r1.groupID;
+                        r1.groupID = groupID;
+                        r2.groupID = groupID;
 
-						r2.groupID = groupID;
+                        groupList.get(groupID).routerList.add(r1);
+                        groupList.get(groupID).routerList.add(r2);
+                    } else if (r1.groupID != -1) {
+                        int groupID = r1.groupID;
 
-						groupList.get(groupID).routerList.add(r2);
-					} else if (r2.groupID != -1) {
-						int groupID = r2.groupID;
+                        r2.groupID = groupID;
 
-						r1.groupID = groupID;
+                        groupList.get(groupID).routerList.add(r2);
+                    } else if (r2.groupID != -1) {
+                        int groupID = r2.groupID;
 
-						groupList.get(groupID).routerList.add(r1);
-					}
-				}
-			}
-		}
+                        r1.groupID = groupID;
 
-		for (Group group : groupList) {
-			int largestMeetCount = -1;
-			SojongRouter largestMeetRouter = null;
+                        groupList.get(groupID).routerList.add(r1);
+                    }
+                }
+            }
+        }
 
-			for (SojongRouter r1 : group.routerList) {
-				int totalMeetCount = 0;
+        int centerCount = 0;
 
-				for (Entry<DTNHost, Integer> entry : r1.meetCount.entrySet()) {
-					totalMeetCount += entry.getValue();
-				}
+        outerLoop:
+        while (true) {
+            boolean allNull = true;
 
-				if (largestMeetCount == -1 || largestMeetCount < totalMeetCount) {
-					largestMeetCount = totalMeetCount;
-					largestMeetRouter = r1;
-				}
-			}
+            for (Group group : groupList) {
+                int largestMeetCount = -1;
+                SojongRouter largestMeetRouter = null;
 
-			group.center = largestMeetRouter;
-			largestMeetRouter.isCenter = true;
-			largestMeetRouter.createMessage("the_single_message");
-		}
-	}
+                for (SojongRouter r1 : group.routerList) {
+                    if (group.centerList.contains(r1) == true) {
+                        continue;
+                    }
 
-	public SojongRouter(Settings s) {
-		super(s);
+                    int totalMeetCount = 0;
 
-		initSelf();
-	}
+                    for (Entry<DTNHost, Integer> entry : r1.meetCount.entrySet()) {
+                        totalMeetCount += entry.getValue();
+                    }
 
-	protected SojongRouter(ActiveRouter r) {
-		super(r);
+                    if (largestMeetCount == -1 || largestMeetCount < totalMeetCount) {
+                        largestMeetCount = totalMeetCount;
+                        largestMeetRouter = r1;
+                    }
+                }
 
-		initSelf();
-	}
+                if (largestMeetRouter != null) {
+                    allNull = false;
+                } else {
+                    continue;
+                }
 
-	private void initSelf() {
-		routerList.add(this);
-		warmupTime = new Settings(report.Report.REPORT_NS).getInt(report.Report.WARMUP_S);
-	}
+                group.centerList.add(largestMeetRouter);
+                largestMeetRouter.isCenter = true;
+                largestMeetRouter.createMessage("the_single_message");
 
-	private void meetCountUp(DTNHost other) {
-		int count = 0;
+                ++centerCount;
+                if (centerCount == k) {
+                    break outerLoop;
+                }
+            }
 
-		if (meetCount.containsKey(other) == true) {
-			count = meetCount.get(other) + 1;
-		} else {
-			count = 1;
-		}
+            if (onePerGroup == true || allNull == true) {
+                break;
+            }
+        }
+    }
 
-		meetCount.put(other, count);
-	}
+    public SojongRouter(Settings s) {
+        super(s);
 
-	private void createMessage(String id) {
-		Message m = new Message(getHost(), null, id, 0);
-		m.setResponseSize(0);
-		createNewMessage(m);
-	}
+        initSelf();
+    }
 
-	@Override
-	protected int checkReceiving(Message m, DTNHost from) {
-		int recvCheck = super.checkReceiving(m, from);
+    protected SojongRouter(ActiveRouter r) {
+        super(r);
 
-		if (recvCheck == RCV_OK) {
-			if (isWarmUp() == true) {
-				SojongRouter otherRouter = (SojongRouter) from.getRouter();
+        initSelf();
+    }
 
-				meetCountUp(from);
-				otherRouter.meetCountUp(getHost());
-			}
+    private void initSelf() {
+        routerList.add(this);
+        warmupTime = new Settings(report.Report.REPORT_NS).getInt(report.Report.WARMUP_S);
+    }
+
+    private void meetCountUp(DTNHost other) {
+        int count = 0;
+
+        if (meetCount.containsKey(other) == true) {
+            count = meetCount.get(other) + 1;
+        } else {
+            count = 1;
+        }
+
+        meetCount.put(other, count);
+    }
+
+    private void createMessage(String id) {
+        Message m = new Message(getHost(), null, id, 0);
+        m.setResponseSize(0);
+        createNewMessage(m);
+    }
+
+    @Override
+    protected int checkReceiving(Message m, DTNHost from) {
+        int recvCheck = super.checkReceiving(m, from);
+
+        if (recvCheck == RCV_OK) {
+            if (isWarmUp() == true) {
+                SojongRouter otherRouter = (SojongRouter) from.getRouter();
+
+                meetCountUp(from);
+                otherRouter.meetCountUp(getHost());
+            }
 
 			/* don't accept a message that has already traversed this node */
-			if (m.getHops().contains(getHost())) {
-				recvCheck = DENIED_OLD;
-			}
-		}
+            if (m.getHops().contains(getHost())) {
+                recvCheck = DENIED_OLD;
+            }
+        }
 
-		if (isWarmUp() == true) {
-			return DENIED_UNSPECIFIED;
-		} else {
-			return recvCheck;
-		}
-	}
+        if (isWarmUp() == true) {
+            return DENIED_UNSPECIFIED;
+        } else {
+            return recvCheck;
+        }
+    }
 
-	@Override
-	public void update() {
-		super.update();
+    @Override
+    public void update() {
+        super.update();
 
-		if (warmUpEnded == false && isWarmUp() == false) {
-			warmUpEnded = true;
-			warmUpEnd();
-		}
+        if (warmUpEnded == false && isWarmUp() == false) {
+            warmUpEnded = true;
+            warmUpEnd();
+        }
 
-		if (isTransferring() || !canStartTransfer()) {
-			return;
-		}
+        if (isTransferring() || !canStartTransfer()) {
+            return;
+        }
 
-		if (exchangeDeliverableMessages() != null) {
-			return;
-		}
+        if (exchangeDeliverableMessages() != null) {
+            return;
+        }
 
-		tryAllMessagesToAllConnections();
-	}
+        tryAllMessagesToAllConnections();
+    }
 
-	@Override
-	public MessageRouter replicate() {
-		// TODO Auto-generated method stub
-		return new SojongRouter(this);
-	}
+    @Override
+    public MessageRouter replicate() {
+        // TODO Auto-generated method stub
+        return new SojongRouter(this);
+    }
 }
