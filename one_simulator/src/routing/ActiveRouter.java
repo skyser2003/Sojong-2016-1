@@ -158,6 +158,13 @@ public abstract class ActiveRouter extends MessageRouter {
 		return m;
 	}
 
+	@Override
+	protected void clearMessages(){
+		super.clearMessages();
+
+		sendingConnections.clear();
+	}
+
 	/**
 	 * Returns a list of connections this host currently has with other hosts.
 	 * @return a list of connections this host currently has with other hosts
