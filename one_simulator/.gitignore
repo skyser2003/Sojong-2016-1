@@ -17,7 +17,6 @@ doc/package-list
 .settings/org.eclipse.*
 
 # IntelliJ IDE files
-.idea/
 out/
 
 # Binary
