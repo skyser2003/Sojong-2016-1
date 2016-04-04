@@ -20,7 +20,7 @@ public class HCRouter extends ActiveRouter {
     static int warmupTime = 0;
     static boolean warmUpEnded = false;
 
-    static boolean onePerGroup = true;
+    static boolean onePerGroup = false;
     static int centerNodeCount = 10;
     static int meetCount = 5;
 
