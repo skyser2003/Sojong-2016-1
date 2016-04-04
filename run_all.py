@@ -51,7 +51,7 @@ def main():
     os.chdir('one_simulator')
     compile()
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', dest='plot', action="store_true")
+    parser.add_argument('-np', dest='plot', action="store_false")
     parser.add_argument('count', type=int)
     parser.add_argument('settings', type=str, nargs='*',
                         default=['setcover_settings.txt',
