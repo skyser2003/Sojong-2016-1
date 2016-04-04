@@ -22,11 +22,12 @@ public class HCRouter extends ActiveRouter {
 
     static boolean onePerGroup = true;
     static int centerNodeCount = 10;
+    static int meetCount = 5;
 
     private int groupID = -1;
     private boolean isCenter = false;
 
-    private HashMap<DTNHost, Integer> meetCount = new HashMap<>();
+    private HashMap<DTNHost, Integer> minMeetCount = new HashMap<>();
 
     static private boolean isWarmUp() {
         return warmupTime > SimClock.getTime();
@@ -50,7 +51,7 @@ public class HCRouter extends ActiveRouter {
 
         for (HCRouter r1 : routerList) {
             for (HCRouter r2 : routerList) {
-                if (r1.meetCount.containsKey(r2.getHost()) == false) {
+                if (r1.minMeetCount.containsKey(r2.getHost()) == false) {
                     continue;
                 }
                 if (r1.groupID != -1 && r2.groupID != -1) {
@@ -59,14 +60,14 @@ public class HCRouter extends ActiveRouter {
 
                 int meetShareTargetCount = 0;
 
-                for (Entry<DTNHost, Integer> entry : r1.meetCount.entrySet()) {
+                for (Entry<DTNHost, Integer> entry : r1.minMeetCount.entrySet()) {
                     DTNHost host = entry.getKey();
 
                     if (host == r2.getHost()) {
                         continue;
                     }
 
-                    if (r2.meetCount.containsKey(host) == true) {
+                    if (r2.minMeetCount.containsKey(host) == true) {
                         ++meetShareTargetCount;
                     }
                 }
@@ -115,7 +116,7 @@ public class HCRouter extends ActiveRouter {
 
                     int totalMeetCount = 0;
 
-                    for (Entry<DTNHost, Integer> entry : r1.meetCount.entrySet()) {
+                    for (Entry<DTNHost, Integer> entry : r1.minMeetCount.entrySet()) {
                         totalMeetCount += entry.getValue();
                     }
 
@@ -154,6 +155,7 @@ public class HCRouter extends ActiveRouter {
 
         Settings routerSetting = new Settings(HC_NS);
         centerNodeCount = routerSetting.getInt("centerNodeCount", centerNodeCount);
+        minMeetCount = routerSetting.getInt("minMeetCount", minMeetCount);
     }
 
     protected HCRouter(ActiveRouter r) {
@@ -170,13 +172,13 @@ public class HCRouter extends ActiveRouter {
     private void meetCountUp(DTNHost other) {
         int count = 0;
 
-        if (meetCount.containsKey(other) == true) {
-            count = meetCount.get(other) + 1;
+        if (minMeetCount.containsKey(other) == true) {
+            count = minMeetCount.get(other) + 1;
         } else {
             count = 1;
         }
 
-        meetCount.put(other, count);
+        minMeetCount.put(other, count);
     }
 
     private void createMessage(String id) {
