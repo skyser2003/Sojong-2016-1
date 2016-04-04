@@ -72,7 +72,7 @@ public class HCRouter extends ActiveRouter {
                     }
                 }
 
-                if (meetShareTargetCount >= 5) {
+                if (meetShareTargetCount >= meetCount) {
                     if (r1.groupID == -1 && r2.groupID == -1) {
                         int groupID = groupList.size();
                         groupList.add(new HCGroup());
@@ -155,7 +155,7 @@ public class HCRouter extends ActiveRouter {
 
         Settings routerSetting = new Settings(HC_NS);
         centerNodeCount = routerSetting.getInt("centerNodeCount", centerNodeCount);
-        minMeetCount = routerSetting.getInt("minMeetCount", minMeetCount);
+        meetCount = routerSetting.getInt("meetCount", meetCount);
     }
 
     protected HCRouter(ActiveRouter r) {

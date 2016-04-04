@@ -169,7 +169,7 @@ ProphetRouter.secondsInTimeUnit = 30
 SprayAndWaitRouter.nrofCopies = 6
 SprayAndWaitRouter.binaryMode = true
 HCRouter.centerNodeCount = 10
-HCRouter.minMeetCount = 5
+HCRouter.meetCount = 5
 
 ## Optimization settings -- these affect the speed of the simulation
 ## see World class for details.
