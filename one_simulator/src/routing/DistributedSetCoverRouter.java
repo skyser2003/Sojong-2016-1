@@ -2,7 +2,6 @@ package routing;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,9 +13,11 @@ import core.SimClock;
 import util.Tuple;
 
 public class DistributedSetCoverRouter extends ActiveRouter {
+    public static final String DISTRIBUTEDSETCOVER_NS = "DistributedSetCoverRouter";
+
 	static int warmupTime = 0;
 	static boolean warmUpEnded = false;
-	static int k = 10;
+	static int centerNodeCount = 10;
 
 	static int messageTtl = 600;
 	static private ArrayList<DistributedSetCoverRouter> routerList = new ArrayList<>();
@@ -51,7 +52,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 
 		ArrayList<DistributedSetCoverRouter> centerList = new ArrayList<>();
 
-		while (copyList.size() != 0 && centerList.size() < k) {
+		while (copyList.size() != 0 && centerList.size() < centerNodeCount) {
 			DistributedSetCoverRouter maxRouter = null;
 			int maxCount = -1;
 
@@ -91,6 +92,9 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		super(s);
 
 		initSelf();
+
+        Settings routerSetting = new Settings(DISTRIBUTEDSETCOVER_NS);
+        centerNodeCount = routerSetting.getInt("centerNodeCount", centerNodeCount);
 	}
 
 	protected DistributedSetCoverRouter(ActiveRouter r) {

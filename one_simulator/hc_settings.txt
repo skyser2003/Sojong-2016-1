@@ -7,7 +7,6 @@ Scenario.name = hc_scenario
 Scenario.simulateConnections = true
 Scenario.updateInterval = 0.1
 # 43200s == 12h
-Scenario.endTime = 10000000
 Scenario.endTime = 43200
 
 ## Interface-specific settings:
@@ -169,6 +168,7 @@ Report.report5 = AllSpreadReport
 ProphetRouter.secondsInTimeUnit = 30
 SprayAndWaitRouter.nrofCopies = 6
 SprayAndWaitRouter.binaryMode = true
+HCRouter.centerNodeCount = 10
 
 ## Optimization settings -- these affect the speed of the simulation
 ## see World class for details.

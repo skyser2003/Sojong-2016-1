@@ -168,6 +168,7 @@ Report.report5 = AllSpreadReport
 ProphetRouter.secondsInTimeUnit = 30
 SprayAndWaitRouter.nrofCopies = 6
 SprayAndWaitRouter.binaryMode = true
+RandomRouter.centerNodeCount = 10
 
 ## Optimization settings -- these affect the speed of the simulation
 ## see World class for details.

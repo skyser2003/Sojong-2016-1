@@ -12,6 +12,8 @@ import core.SimClock;
 import sojong.HCGroup;
 
 public class HCRouter extends ActiveRouter {
+    public static final String HC_NS = "HCRouter";
+
     static private ArrayList<HCGroup> groupList = new ArrayList<>();
     static private ArrayList<HCRouter> routerList = new ArrayList<>();
 
@@ -19,7 +21,7 @@ public class HCRouter extends ActiveRouter {
     static boolean warmUpEnded = false;
 
     static boolean onePerGroup = true;
-    static int k = 10;
+    static int centerNodeCount = 10;
 
     private int groupID = -1;
     private boolean isCenter = false;
@@ -134,7 +136,7 @@ public class HCRouter extends ActiveRouter {
                 largestMeetRouter.createMessage("the_single_message");
 
                 ++centerCount;
-                if (centerCount == k) {
+                if (centerCount == centerNodeCount) {
                     break outerLoop;
                 }
             }
@@ -149,6 +151,9 @@ public class HCRouter extends ActiveRouter {
         super(s);
 
         initSelf();
+
+        Settings routerSetting = new Settings(HC_NS);
+        centerNodeCount = routerSetting.getInt("centerNodeCount", centerNodeCount);
     }
 
     protected HCRouter(ActiveRouter r) {

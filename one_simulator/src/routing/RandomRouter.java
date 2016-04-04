@@ -7,6 +7,8 @@ import core.SimClock;
 import java.util.ArrayList;
 
 public class RandomRouter extends ActiveRouter {
+    public static final String RANDOM_NS = "RandomRouter";
+
     static ArrayList<RandomRouter> routerList = new ArrayList<>();
 
     static private double warmUpTime = 0.0;
@@ -65,6 +67,9 @@ public class RandomRouter extends ActiveRouter {
         super(s);
 
         initSelf();
+
+        Settings routerSetting = new Settings(RANDOM_NS);
+        centerNodeCount = routerSetting.getInt("centerNodeCount", centerNodeCount);
     }
 
     private void initSelf() {
