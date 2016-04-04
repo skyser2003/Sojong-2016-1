@@ -4,11 +4,15 @@ import plot
 from StringIO import StringIO
 import os
 import os.path
+import platform
+
+sep = ';' if platform.system() else ':'
 
 default_args = ['java', '-Xmx512M',
-                '-cp', 'target:lib/ECLA.jar'
-                ':lib/DTNConsoleConnection.jar'
-                ':lib/json-simple-1.1.1.jar',
+                '-cp', sep.join([
+                    'target:lib/ECLA.jar',
+                    'lib/DTNConsoleConnection.jar',
+                    'lib/json-simple-1.1.1.jar']),
                 'core.DTNSim']
 
 
@@ -29,6 +33,9 @@ def run(count, setting, write_plot):
 
 def main():
     os.chdir('one_simulator')
+    compile = 'compile.' + ('bat' if sep == ';' else 'sh')
+    print compile
+    subprocess.check_call([compile])
     parser = argparse.ArgumentParser()
     parser.add_argument('-p', dest='plot', action="store_true")
     parser.add_argument('count', type=int)
