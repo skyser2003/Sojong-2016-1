@@ -1,23 +1,19 @@
 package routing;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Random;
 
-import core.Connection;
 import core.DTNHost;
 import core.Message;
 import core.Settings;
 import core.SimClock;
-import sojong.Group;
+import sojong.HCGroup;
 
-public class SojongRouter extends ActiveRouter {
-    static private ArrayList<Group> groupList = new ArrayList<>();
-    static private ArrayList<SojongRouter> routerList = new ArrayList<>();
+public class HCRouter extends ActiveRouter {
+    static private ArrayList<HCGroup> groupList = new ArrayList<>();
+    static private ArrayList<HCRouter> routerList = new ArrayList<>();
 
     static int warmupTime = 0;
     static boolean warmUpEnded = false;
@@ -35,9 +31,9 @@ public class SojongRouter extends ActiveRouter {
     }
 
     static private void warmUpEnd() {
-        List<SojongRouter> removeList = new ArrayList<>();
+        List<HCRouter> removeList = new ArrayList<>();
 
-        for (SojongRouter router : routerList) {
+        for (HCRouter router : routerList) {
             if (router.getHost() == null) {
                 removeList.add(router);
                 continue;
@@ -46,12 +42,12 @@ public class SojongRouter extends ActiveRouter {
             router.clearMessages();
         }
 
-        for (SojongRouter router : removeList) {
+        for (HCRouter router : removeList) {
             routerList.remove(router);
         }
 
-        for (SojongRouter r1 : routerList) {
-            for (SojongRouter r2 : routerList) {
+        for (HCRouter r1 : routerList) {
+            for (HCRouter r2 : routerList) {
                 if (r1.meetCount.containsKey(r2.getHost()) == false) {
                     continue;
                 }
@@ -76,7 +72,7 @@ public class SojongRouter extends ActiveRouter {
                 if (meetShareTargetCount >= 5) {
                     if (r1.groupID == -1 && r2.groupID == -1) {
                         int groupID = groupList.size();
-                        groupList.add(new Group());
+                        groupList.add(new HCGroup());
 
                         r1.groupID = groupID;
                         r2.groupID = groupID;
@@ -106,11 +102,11 @@ public class SojongRouter extends ActiveRouter {
         while (true) {
             boolean allNull = true;
 
-            for (Group group : groupList) {
+            for (HCGroup group : groupList) {
                 int largestMeetCount = -1;
-                SojongRouter largestMeetRouter = null;
+                HCRouter largestMeetRouter = null;
 
-                for (SojongRouter r1 : group.routerList) {
+                for (HCRouter r1 : group.routerList) {
                     if (group.centerList.contains(r1) == true) {
                         continue;
                     }
@@ -149,13 +145,13 @@ public class SojongRouter extends ActiveRouter {
         }
     }
 
-    public SojongRouter(Settings s) {
+    public HCRouter(Settings s) {
         super(s);
 
         initSelf();
     }
 
-    protected SojongRouter(ActiveRouter r) {
+    protected HCRouter(ActiveRouter r) {
         super(r);
 
         initSelf();
@@ -190,7 +186,7 @@ public class SojongRouter extends ActiveRouter {
 
         if (recvCheck == RCV_OK) {
             if (isWarmUp() == true) {
-                SojongRouter otherRouter = (SojongRouter) from.getRouter();
+                HCRouter otherRouter = (HCRouter) from.getRouter();
 
                 meetCountUp(from);
                 otherRouter.meetCountUp(getHost());
@@ -232,6 +228,6 @@ public class SojongRouter extends ActiveRouter {
     @Override
     public MessageRouter replicate() {
         // TODO Auto-generated method stub
-        return new SojongRouter(this);
+        return new HCRouter(this);
     }
 }

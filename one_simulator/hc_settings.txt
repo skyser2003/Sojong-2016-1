@@ -3,7 +3,7 @@
 #
 
 ## Scenario settings
-Scenario.name = sojong_scenario
+Scenario.name = hc_scenario
 Scenario.simulateConnections = true
 Scenario.updateInterval = 0.1
 # 43200s == 12h
@@ -53,7 +53,7 @@ Scenario.nrofHostGroups = 6
 
 # Common settings for all groups
 Group.movementModel = ShortestPathMapBasedMovement
-Group.router = SojongRouter
+Group.router = HCRouter
 Group.bufferSize = 5M
 Group.waitTime = 0, 120
 # All nodes have the bluetooth interface
