@@ -5,6 +5,7 @@ import os
 import os.path
 import glob
 import shutil
+import threading
 import platform
 
 sep = ';' if platform.system() == 'Windows' else ':'
@@ -20,13 +21,12 @@ default_args = ['java', '-Xmx512M',
 
 def run(count, setting, write_plot):
     print "Run : " + setting
-    pp = subprocess.Popen(default_args + ['-b', str(count), setting],
-                          stdout=subprocess.PIPE)
-    sim_name = None
-    for line in pp.stdout:
-        print line.strip()
-        if not sim_name and line.startswith('Running simulation '):
-            sim_name = line.strip().split("'", 1)[1][:-1]
+    pp = subprocess.Popen(default_args + ['-b', str(count), setting])
+    with open(setting, 'r') as setting_file:
+        for line in setting_file:
+            if line.startswith('Scenario.name'):
+                sim_name = line.strip()[len('Scenario.name = '):]
+    pp.wait()
     if write_plot:
         print "write plot"
         plot.plot_report(
@@ -59,8 +59,15 @@ def main():
                                  'random_settings.txt'])
     args = parser.parse_args()
 
+    threads = []
     for setting in args.settings:
-        run(args.count, setting, args.plot)
+        thread = threading.Thread(None, run,
+                                  args=(args.count, setting, args.plot))
+        thread.start()
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
 
 
 if __name__ == "__main__":
