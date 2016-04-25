@@ -53,7 +53,12 @@ def write_plot(sim_name):
 
 def main():
     os.chdir('one_simulator')
-    shutil.rmtree('reports')
+
+    if os.path.exists('reports'):
+        shutil.rmtree('reports')
+
+    os.makedirs('reports')
+
     compile()
     parser = argparse.ArgumentParser()
     parser.add_argument('-np', dest='plot', action="store_false")
