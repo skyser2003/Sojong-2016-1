@@ -19,18 +19,17 @@ default_args = ['java', '-Xmx512M',
                 'core.DTNSim']
 
 
-def run(count, setting, write_plot):
-    print "Run : " + setting
-    pp = subprocess.Popen(default_args + ['-b', str(count), setting])
+def get_sim_name(setting):
     with open(setting, 'r') as setting_file:
         for line in setting_file:
             if line.startswith('Scenario.name'):
-                sim_name = line.strip()[len('Scenario.name = '):]
+                return line.strip()[len('Scenario.name = '):]
+
+
+def run(count, setting):
+    print "Run : " + setting
+    pp = subprocess.Popen(default_args + ['-b', str(count), setting])
     pp.wait()
-    if write_plot:
-        print "write plot"
-        plot.plot_report(
-            os.path.join('reports', sim_name + '_AllSpreadReport.txt'))
 
 
 def compile():
@@ -45,6 +44,11 @@ def compile():
                            '-extdirs', 'lib/'] + sources)
     if not os.path.isdir('target/gui/buttonGraphics'):
         shutil.copytree('src/gui/buttonGraphics', 'target/gui/buttonGraphics')
+
+
+def write_plot(sim_name):
+    plot.plot_report(
+        os.path.join('reports', sim_name + '_AllSpreadReport.txt'))
 
 
 def main():
@@ -63,12 +67,18 @@ def main():
     threads = []
     for setting in args.settings:
         thread = threading.Thread(None, run,
-                                  args=(args.count, setting, args.plot))
+                                  args=(args.count, setting))
         thread.start()
         threads.append(thread)
 
     for thread in threads:
         thread.join()
+
+    threads = []
+    for setting in args.settings:
+        if args.plot:
+            sim_name = get_sim_name(setting)
+            write_plot(sim_name)
 
 
 if __name__ == "__main__":
