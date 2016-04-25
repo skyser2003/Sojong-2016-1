@@ -75,13 +75,15 @@ public class HCRouter extends ActiveRouter {
                 if (meetShareTargetCount >= meetCount) {
                     if (r1.groupID == -1 && r2.groupID == -1) {
                         int groupID = groupList.size();
-                        groupList.add(new HCGroup());
+                        HCGroup group = new HCGroup();
+                        group.meetCount = meetCount;
+                        groupList.add(group);
 
                         r1.groupID = groupID;
                         r2.groupID = groupID;
 
-                        groupList.get(groupID).routerList.add(r1);
-                        groupList.get(groupID).routerList.add(r2);
+                        group.routerList.add(r1);
+                        group.routerList.add(r2);
                     } else if (r1.groupID != -1) {
                         int groupID = r1.groupID;
 
