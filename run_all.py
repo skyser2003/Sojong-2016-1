@@ -49,6 +49,7 @@ def compile():
 
 def main():
     os.chdir('one_simulator')
+    shutil.rmtree('reports')
     compile()
     parser = argparse.ArgumentParser()
     parser.add_argument('-np', dest='plot', action="store_false")
