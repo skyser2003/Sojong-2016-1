@@ -166,6 +166,7 @@ SprayAndWaitRouter.nrofCopies = 6
 SprayAndWaitRouter.binaryMode = true
 HCRouter.centerNodeCount = 10
 HCRouter.meetCount = 3
+HCRouter.clusterLevel = 0
 
 ## Optimization settings -- these affect the speed of the simulation
 ## see World class for details.

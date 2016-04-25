@@ -23,6 +23,7 @@ public class HCRouter extends ActiveRouter {
     static boolean onePerGroup = false;
     static int centerNodeCount = 10;
     static int meetCount = 5;
+    static int clusterLevel = 0;
 
     private int groupID = -1;
     private boolean isCenter = false;
@@ -101,6 +102,41 @@ public class HCRouter extends ActiveRouter {
             }
         }
 
+        ArrayList<HCGroup> newGroupList = new ArrayList<>();
+
+        // Clustering
+        for (int i = 0; i < clusterLevel; ++i) {
+            groupList.addAll(newGroupList);
+
+            for (int j = 0; j < groupList.size(); ) {
+                HCGroup group1 = groupList.get(j);
+
+                HCGroup largestWeightGroup = null;
+                int largestWeight = -1;
+
+                for (int k = 1; k < groupList.size(); ++k) {
+                    HCGroup group2 = groupList.get(k);
+
+                    int curWeight = group1.weight(group2);
+                    if(curWeight != 0 && largestWeight < curWeight) {
+                        largestWeightGroup = group2;
+                        largestWeight = curWeight;
+                    }
+                }
+
+                if(largestWeightGroup == null) {
+                    break;
+                } else {
+                    newGroupList.add(HCGroup.merge(group1, largestWeightGroup));
+
+                    groupList.remove(group1);
+                    groupList.remove(largestWeightGroup);
+                }
+            }
+        }
+
+        groupList.addAll(newGroupList);
+
         int centerCount = 0;
 
         outerLoop:
@@ -158,6 +194,7 @@ public class HCRouter extends ActiveRouter {
         Settings routerSetting = new Settings(HC_NS);
         centerNodeCount = routerSetting.getInt("centerNodeCount", centerNodeCount);
         meetCount = routerSetting.getInt("meetCount", meetCount);
+        clusterLevel = routerSetting.getInt("clusterLevel", clusterLevel);
     }
 
     protected HCRouter(ActiveRouter r) {
@@ -187,6 +224,10 @@ public class HCRouter extends ActiveRouter {
         Message m = new Message(getHost(), null, id, 0);
         m.setResponseSize(0);
         createNewMessage(m);
+    }
+
+    public int meetCount(HCRouter other) {
+        return minMeetCount.getOrDefault(other.getHost(), 0);
     }
 
     @Override
