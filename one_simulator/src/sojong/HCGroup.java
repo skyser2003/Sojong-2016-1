@@ -15,6 +15,7 @@ public class HCGroup {
 
         ret.routerList.addAll(group1.routerList);
         ret.routerList.addAll(group2.routerList);
+        ret.meetCount = group1.meetCount;
 
         return ret;
     }

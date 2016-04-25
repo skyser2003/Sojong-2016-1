@@ -107,6 +107,7 @@ public class HCRouter extends ActiveRouter {
         // Clustering
         for (int i = 0; i < clusterLevel; ++i) {
             groupList.addAll(newGroupList);
+            newGroupList.clear();
 
             for (int j = 0; j < groupList.size(); ) {
                 HCGroup group1 = groupList.get(j);
@@ -136,6 +137,7 @@ public class HCRouter extends ActiveRouter {
         }
 
         groupList.addAll(newGroupList);
+        newGroupList.clear();
 
         int centerCount = 0;
 
