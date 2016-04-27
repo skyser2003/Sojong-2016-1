@@ -6,7 +6,6 @@ import os.path
 import glob
 import shutil
 import platform
-from functools import partial
 from multiprocessing import Pool, cpu_count
 
 cpu_count = cpu_count()
@@ -50,9 +49,10 @@ def compile():
         shutil.copytree('src/gui/buttonGraphics', 'target/gui/buttonGraphics')
 
 
-def write_plot(sim_name):
+def write_plot(index, sim_name):
     plot.plot_report(
-        os.path.join('reports', sim_name + '_AllSpreadReport.txt'))
+        os.path.join('reports',
+                     '{0}_AllSpreadReport_{1}.txt'.format(sim_name, index)))
 
 
 def main():
@@ -85,10 +85,11 @@ def main():
     pool.close()
     pool.join()
 
-    for setting in args.settings:
-        if args.plot:
-            sim_name = get_sim_name(setting)
-            write_plot(sim_name)
+    if args.plot:
+        for setting in args.settings:
+            for i in range(0, args.count):
+                sim_name = get_sim_name(setting)
+                write_plot(i + 1, sim_name)
 
 
 if __name__ == "__main__":
