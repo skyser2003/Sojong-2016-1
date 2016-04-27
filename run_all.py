@@ -5,8 +5,11 @@ import os
 import os.path
 import glob
 import shutil
-import threading
 import platform
+from functools import partial
+from multiprocessing import Pool, cpu_count
+
+cpu_count = cpu_count()
 
 sep = ';' if platform.system() == 'Windows' else ':'
 
@@ -70,19 +73,12 @@ def main():
                                  'hc_settings2.txt',
                                  'hc_settings3.txt',
                                  'random_settings.txt'])
+    parser.add_argument('-t', dest='thread', type=int, default=cpu_count)
     args = parser.parse_args()
 
-    threads = []
-    for setting in args.settings:
-        thread = threading.Thread(None, run,
-                                  args=(args.count, setting))
-        thread.start()
-        threads.append(thread)
+    pool = Pool(args.thread)
+    pool.map(partial(run, args.count), args.settings)
 
-    for thread in threads:
-        thread.join()
-
-    threads = []
     for setting in args.settings:
         if args.plot:
             sim_name = get_sim_name(setting)
