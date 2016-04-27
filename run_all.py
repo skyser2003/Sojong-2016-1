@@ -73,6 +73,7 @@ def main():
                                  'hc_settings1.txt',
                                  'hc_settings2.txt',
                                  'hc_settings3.txt',
+                                 'hcsw_settings.txt',
                                  'random_settings.txt'])
     parser.add_argument('-t', dest='thread', type=int, default=cpu_count)
     args = parser.parse_args()
