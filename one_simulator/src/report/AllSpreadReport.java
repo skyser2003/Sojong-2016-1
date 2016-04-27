@@ -12,6 +12,7 @@ import core.UpdateListener;
 
 public class AllSpreadReport extends Report implements UpdateListener {
     private boolean written = false;
+    private int prev_count = -1;
 
     public AllSpreadReport() {
         super.init();
@@ -33,6 +34,12 @@ public class AllSpreadReport extends Report implements UpdateListener {
             } else {
                 ++count;
             }
+        }
+
+        if (count == prev_count) {
+            return;
+        } else {
+            prev_count = count;
         }
 
         if (allSpread == true) {
