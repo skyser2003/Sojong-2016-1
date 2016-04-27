@@ -78,14 +78,14 @@ public class DTNSim {
 
 		if (batchMode) {
 			long startTime = System.currentTimeMillis();
-			for (int i=nrofRuns[0]; i<nrofRuns[1]; i++) {
-				print("Run " + (i+1) + "/" + nrofRuns[1]);
-				Settings.setRunIndex(i);
+			//for (int i=nrofRuns[0]; i<nrofRuns[1]; i++) {
+				print("Run " + (nrofRuns[0]+1) + "/" + nrofRuns[1]);
+				Settings.setRunIndex(nrofRuns[0] + 1);
 				resetForNextRun();
 				new DTNSimTextUI().start();
-			}
-			double duration = (System.currentTimeMillis() - startTime)/1000.0;
-			print("---\nAll done in " + String.format("%.2f", duration) + "s");
+			//}
+			//double duration = (System.currentTimeMillis() - startTime)/1000.0;
+			//print("---\nAll done in " + String.format("%.2f", duration) + "s");
 		}
 		else {
 			Settings.setRunIndex(guiIndex);

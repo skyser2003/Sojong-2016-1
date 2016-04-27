@@ -29,9 +29,10 @@ def get_sim_name(setting):
                 return line.strip()[len('Scenario.name = '):]
 
 
-def run(count, setting):
-    print "Run : " + setting
-    pp = subprocess.Popen(default_args + ['-b', str(count), 'general_settings.txt', setting])
+def run(n, count, setting):
+    print "Run : {0} ({1}/{2})".format(setting, n, count)
+    pp = subprocess.Popen(default_args + ['-b', "{0}:{1}".format(n, count),
+                                          'general_settings.txt', setting])
     pp.wait()
 
 
@@ -77,7 +78,12 @@ def main():
     args = parser.parse_args()
 
     pool = Pool(args.thread)
-    pool.map(partial(run, args.count), args.settings)
+    for i in range(0, args.count):
+        for setting in args.settings:
+            pool.apply_async(run, (i + 1, args.count, setting))
+
+    pool.close()
+    pool.join()
 
     for setting in args.settings:
         if args.plot:
