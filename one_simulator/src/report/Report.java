@@ -120,7 +120,7 @@ public abstract class Report {
 				outDir += "/";	// make sure dir ends with directory delimiter
 			}
 			outFileName = outDir + scenarioName +
-				"_" + this.getClass().getSimpleName();
+				"_" + this.getClass().getSimpleName() + "_" + Settings.getRunIndex();
 			if (outputInterval == -1) {
 				outFileName += OUT_SUFFIX; // no intervalled reports
 			}

@@ -99,6 +99,10 @@ public class Settings {
 		writtenSettings.clear();
 	}
 
+	public static int getRunIndex() {
+		return runIndex;
+	}
+
 	/**
 	 * Checks that the given integer array contains a valid range. I.e.,
 	 * the length of the array must be two and

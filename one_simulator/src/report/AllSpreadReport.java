@@ -14,7 +14,7 @@ public class AllSpreadReport extends Report implements UpdateListener {
     private boolean written = false;
 
     public AllSpreadReport() {
-        init();
+        super.init();
     }
 
     @Override
