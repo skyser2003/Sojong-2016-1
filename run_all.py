@@ -66,6 +66,9 @@ def main():
     parser.add_argument('settings', type=str, nargs='*',
                         default=['setcover_settings.txt',
                                  'hc_settings.txt',
+                                 'hc_settings1.txt',
+                                 'hc_settings2.txt',
+                                 'hc_settings3.txt',
                                  'random_settings.txt'])
     args = parser.parse_args()
 
