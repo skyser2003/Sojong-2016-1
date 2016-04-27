@@ -63,10 +63,12 @@ def write_plot(data, path):
 def main():
     os.chdir('one_simulator')
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-np', dest='plot', action="store_false")
-    parser.add_argument('-r', dest='report', action='store_true')
-    parser.add_argument('count', type=int)
+    parser = argparse.ArgumentParser(description="Run all simulation")
+    parser.add_argument('-np', dest='plot', action="store_false",
+                        help='do not plot')
+    parser.add_argument('-r', dest='report', action='store_true',
+                        help='parse report & plot only')
+    parser.add_argument('count', type=int, help='trial count')
     parser.add_argument('settings', type=str, nargs='*',
                         default=['setcover_settings.txt',
                                  'hc_settings.txt',
@@ -74,8 +76,10 @@ def main():
                                  'hc_settings2.txt',
                                  'hc_settings3.txt',
                                  'hcsw_settings.txt',
-                                 'random_settings.txt'])
-    parser.add_argument('-t', dest='thread', type=int, default=cpu_count)
+                                 'random_settings.txt'],
+                        help="algorithm presets, see one_simulator directory")
+    parser.add_argument('-t', dest='thread', type=int, default=cpu_count,
+                        help="thread pool size - default : cpu count")
     args = parser.parse_args()
 
     if not args.report:
