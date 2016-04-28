@@ -29,15 +29,19 @@ def plot_stastics(data, output_filename):
     i = 0
     plts = []
     names = []
+    
     for k, v in data.items():
         mean = v['mean']
         err_min = mean - v['min']
         err_max = v['max'] - mean
-        p = pyplot.errorbar([i / len(data)], [mean],
+        p = pyplot.errorbar(i + 1, [mean],
                             yerr=[[err_min], [err_max]])
         plts.append(p)
         names.append(k)
         i = i + 1
+
+    axis = pyplot.gca()
+    axis.set_xlim(0, i + 1)
     pyplot.legend(plts, names)
     pyplot.savefig(output_filename)
 
