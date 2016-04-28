@@ -674,6 +674,11 @@ public class Settings {
 		return ranges;
 	}
 
+	public void setInt(String name, Integer value) {
+		String fullname = getFullPropertyName(name, false);
+		props.setProperty(fullname, value.toString());
+	}
+
 	/**
 	 * Returns an integer-valued setting
 	 * @param name Name of the setting to get

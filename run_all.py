@@ -31,7 +31,7 @@ def get_sim_name(setting):
 
 def run(n, count, setting):
     print "Run : {0} ({1}/{2})".format(setting, n, count)
-    pp = subprocess.Popen(default_args + ['-b', "{0}:{1}".format(n, count),
+    pp = subprocess.Popen(default_args + ['-b', "{0}:{1}".format(n, count), 1,
                                           'general_settings.txt', setting])
     pp.wait()
 

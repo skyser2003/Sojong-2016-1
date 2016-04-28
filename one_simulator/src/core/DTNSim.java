@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import movement.MovementModel;
 import ui.DTNSimTextUI;
 
 /**
@@ -42,6 +43,7 @@ public class DTNSim {
 	public static void main(String[] args) {
 		boolean batchMode = false;
 		int nrofRuns[] = {0,1};
+		int seed = 0;
 		String confFiles[];
 		int firstConfIndex = 0;
 		int guiIndex = 0;
@@ -57,7 +59,13 @@ public class DTNSim {
                 }
                 else {
                     nrofRuns = parseNrofRuns(args[1]);
-                    firstConfIndex = 2;
+
+					try {
+						seed = Integer.parseInt(args[2]);
+						firstConfIndex = 3;
+					} catch(Exception e) {
+						firstConfIndex = 2;
+					}
                 }
 			}
 			else { /* GUI mode */
@@ -75,6 +83,8 @@ public class DTNSim {
 		}
 
 		initSettings(confFiles, firstConfIndex);
+		Settings s = new Settings(MovementModel.MOVEMENT_MODEL_NS);
+		s.setInt(MovementModel.RNG_SEED, seed);
 
 		if (batchMode) {
 			long startTime = System.currentTimeMillis();
