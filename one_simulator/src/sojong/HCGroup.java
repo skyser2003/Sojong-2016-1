@@ -22,10 +22,13 @@ public class HCGroup {
     public int maxWeight(HCGroup other) {
         int maxWeight = 0;
 
-        for(HCRouter r1 : routerList) {
+        ArrayList<HCRouter> allRouterList = allRouterList();
+        ArrayList<HCRouter> otherRouterList = other.allRouterList();
+
+        for(HCRouter r1 : allRouterList) {
             int localMax = 0;
 
-            for(HCRouter r2 : other.routerList) {
+            for(HCRouter r2 : otherRouterList) {
                 if(r1.meetCount(r2) != 0){
                     ++localMax;
                 }
@@ -43,15 +46,15 @@ public class HCGroup {
         }
     }
 
-    public ArrayList<HCGroup> allLeafChildren() {
-        ArrayList<HCGroup> ret = new ArrayList<>();
+    public ArrayList<HCRouter> allRouterList() {
+        ArrayList<HCRouter> ret = new ArrayList<>();
 
         for(HCGroup child : childGroupList) {
-            ret.addAll(child.allLeafChildren());
+            ret.addAll(child.allRouterList());
         }
 
         if(ret.size() == 0) {
-            ret.add(this);
+            ret.addAll(routerList);
         }
 
         return ret;

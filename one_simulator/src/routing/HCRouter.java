@@ -100,10 +100,10 @@ public class HCRouter extends ActiveRouter {
             }
         }
 
-        ArrayList<HCWeightRelation> groupWeightList = new ArrayList<>();
-
         // Clustering
         for (int i = 0; i < clusterLevel; ++i) {
+            ArrayList<HCWeightRelation> groupWeightList = new ArrayList<>();
+
             for (int j = 0; j < groupList.size(); ++j) {
                 HCGroup group1 = groupList.get(j);
 
@@ -117,20 +117,20 @@ public class HCRouter extends ActiveRouter {
                     }
                 }
             }
-        }
 
-        Collections.sort(groupWeightList);
-        Collections.reverse(groupWeightList);
+            Collections.sort(groupWeightList);
+            Collections.reverse(groupWeightList);
 
-        for (HCWeightRelation relation : groupWeightList) {
-            if(groupList.contains(relation.r1) && groupList.contains(relation.r2)) {
-                groupList.remove(relation.r1);
-                groupList.remove(relation.r2);
+            for (HCWeightRelation relation : groupWeightList) {
+                if(groupList.contains(relation.r1) && groupList.contains(relation.r2)) {
+                    groupList.remove(relation.r1);
+                    groupList.remove(relation.r2);
 
-                HCGroup cluster = new HCGroup();
-                cluster.addChild(relation.r1);
-                cluster.addChild(relation.r2);
-                groupList.add(cluster);
+                    HCGroup cluster = new HCGroup();
+                    cluster.addChild(relation.r1);
+                    cluster.addChild(relation.r2);
+                    groupList.add(cluster);
+                }
             }
         }
 
@@ -144,7 +144,9 @@ public class HCRouter extends ActiveRouter {
                 int largestMeetCount = -1;
                 HCRouter largestMeetRouter = null;
 
-                for (HCRouter r1 : group.routerList) {
+                ArrayList<HCRouter> allRouterList = group.allRouterList();
+
+                for (HCRouter r1 : allRouterList) {
                     if (group.centerList.contains(r1) == true) {
                         continue;
                     }
