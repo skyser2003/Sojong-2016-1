@@ -7,6 +7,7 @@ import glob
 import shutil
 import platform
 import json
+import random
 from multiprocessing import Pool, cpu_count
 
 cpu_count = cpu_count()
@@ -30,8 +31,10 @@ def get_sim_name(setting):
 
 
 def run(n, count, setting):
+    random.seed()
+    seed = str(random.randint(1, 100))
     print "Run : {0} ({1}/{2})".format(setting, n, count)
-    pp = subprocess.Popen(default_args + ['-b', "{0}:{1}".format(n, count), 1,
+    pp = subprocess.Popen(default_args + ['-b', "{0}:{1}".format(n, count), seed,
                                           'general_settings.txt', setting])
     pp.wait()
 
