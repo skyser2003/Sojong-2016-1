@@ -1,8 +1,6 @@
 package routing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 import core.DTNHost;
@@ -10,6 +8,7 @@ import core.Message;
 import core.Settings;
 import core.SimClock;
 import sojong.HCGroup;
+import sojong.HCWeightRelation;
 
 public class HCRouter extends ActiveRouter {
     public static final String HC_NS = "HCRouter";
@@ -77,7 +76,6 @@ public class HCRouter extends ActiveRouter {
                     if (r1.groupID == -1 && r2.groupID == -1) {
                         int groupID = groupList.size();
                         HCGroup group = new HCGroup();
-                        group.meetCount = meetCount;
                         groupList.add(group);
 
                         r1.groupID = groupID;
@@ -102,42 +100,39 @@ public class HCRouter extends ActiveRouter {
             }
         }
 
-        ArrayList<HCGroup> newGroupList = new ArrayList<>();
+        ArrayList<HCWeightRelation> groupWeightList = new ArrayList<>();
 
         // Clustering
         for (int i = 0; i < clusterLevel; ++i) {
-            groupList.addAll(newGroupList);
-            newGroupList.clear();
-
-            for (int j = 0; j < groupList.size(); ) {
+            for (int j = 0; j < groupList.size(); ++j) {
                 HCGroup group1 = groupList.get(j);
 
-                HCGroup largestWeightGroup = null;
-                int largestWeight = -1;
-
-                for (int k = 1; k < groupList.size(); ++k) {
+                for (int k = j + 1; k < groupList.size(); ++k) {
                     HCGroup group2 = groupList.get(k);
 
-                    int curWeight = group1.weight(group2);
-                    if(curWeight != 0 && largestWeight < curWeight) {
-                        largestWeightGroup = group2;
-                        largestWeight = curWeight;
+                    int maxWeight = group1.maxWeight(group2);
+                    if (maxWeight != 0) {
+                        HCWeightRelation relation = new HCWeightRelation(maxWeight, group1, group2);
+                        groupWeightList.add(relation);
                     }
-                }
-
-                if(largestWeightGroup == null) {
-                    break;
-                } else {
-                    newGroupList.add(HCGroup.merge(group1, largestWeightGroup));
-
-                    groupList.remove(group1);
-                    groupList.remove(largestWeightGroup);
                 }
             }
         }
 
-        groupList.addAll(newGroupList);
-        newGroupList.clear();
+        Collections.sort(groupWeightList);
+        Collections.reverse(groupWeightList);
+
+        for (HCWeightRelation relation : groupWeightList) {
+            if(groupList.contains(relation.r1) && groupList.contains(relation.r2)) {
+                groupList.remove(relation.r1);
+                groupList.remove(relation.r2);
+
+                HCGroup cluster = new HCGroup();
+                cluster.addChild(relation.r1);
+                cluster.addChild(relation.r2);
+                groupList.add(cluster);
+            }
+        }
 
         int centerCount = 0;
 
