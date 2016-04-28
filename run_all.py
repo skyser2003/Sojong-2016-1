@@ -8,6 +8,7 @@ import shutil
 import platform
 import json
 import random
+import csv
 from multiprocessing import Pool, cpu_count
 
 cpu_count = cpu_count()
@@ -125,8 +126,15 @@ def main():
                 'max': max_val
             }
         plot.plot_stastics(stastics, os.path.join('reports', 'stastics.png'))
-        with open(os.path.join('reports', ' stastics.txt'), 'w') as f:
+        with open(os.path.join('reports', 'stastics.txt'), 'w') as f:
             json.dump(stastics, f)
+        with open(os.path.join('reports', 'stastics.csv'), 'w') as f:
+            writer = csv.DictWriter(f,
+                                    ['name', 'mean', 'min', 'max', 'variance'])
+            writer.writeheader()
+            for k, v in stastics.items():
+                v['name'] = k
+                writer.writerow(v)
 
 
 if __name__ == "__main__":
