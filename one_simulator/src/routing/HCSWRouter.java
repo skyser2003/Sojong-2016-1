@@ -52,6 +52,11 @@ public class HCSWRouter extends ActiveRouter {
             parentGroup = parent;
             parent.childrenGroups.add(this);
         }
+
+        @Override
+        public String toString() {
+            return String.format("%d %s", level, super.toString());
+        }
     }
     static private ArrayList<HCSWGroup> groupList = new ArrayList<>();
     static private ArrayList<HCSWRouter> routerList = new ArrayList<>();
