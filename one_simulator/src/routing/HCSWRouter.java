@@ -126,8 +126,9 @@ public class HCSWRouter extends ActiveRouter {
                 }
 
                 HCSWGroup newGroup = group1.merged(group2, w);
-                routerGroupMap.replace(routerPair.first, newGroup);
-                routerGroupMap.replace(routerPair.second, newGroup);
+                for (HCSWRouter router: newGroup.routers) {
+                    routerGroupMap.replace(router, newGroup);
+                }
                 groups.add(newGroup);
             }
         }
@@ -135,9 +136,11 @@ public class HCSWRouter extends ActiveRouter {
         // Select Center node
         // select largest mean weight node in each cluster
         // find center nodes from high level(largest cluster) to low level
-        Integer[] levels = new Integer[groupsByWeightLevel.size()];
+        Integer[] levels = new Integer[groupsByWeightLevel.size() + 1];
         groupsByWeightLevel.keySet().toArray(levels);
+        levels[levels.length - 1] = Integer.MAX_VALUE;
         Arrays.sort(levels);
+        levels[levels.length - 1] = 0;
         HashSet<HCSWRouter> centerNodes = new HashSet<>();
         loopForLevels:
         for (Integer l : levels) {
