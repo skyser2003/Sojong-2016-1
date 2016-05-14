@@ -3,3 +3,5 @@ Scenario.name = hcsw_scenario
 Group.router = HCSWRouter
 
 HCSWRouter.centerNodeCount = 10
+HCSWRouter.centerNodeMethod = mean
+HCSWRouter.centerNodeMethodAscending = true

@@ -5,15 +5,15 @@ import core.Message;
 import core.Settings;
 import core.SimClock;
 import routing.util.Pair;
-import sojong.HCGroup;
 
 import java.util.*;
-
-import static routing.HCRouter.clusterLevel;
+import java.util.function.Function;
 
 public class HCSWRouter extends ActiveRouter {
     public static final String HCSW_NS = "HCSWRouter";
     public static int centerNodeCount = 0;
+    public static boolean peakNodeByAscending = false;
+    public static Function<Pair<HCSWRouter, HashSet<HCSWRouter>>, Float> peakNode = null;
     static private class HCSWGroup {
         public HashSet<HCSWRouter> routers = new HashSet<>();
         public HCSWGroup parentGroup = null;
@@ -138,22 +138,23 @@ public class HCSWRouter extends ActiveRouter {
         for (Integer l : levels) {
             for (HCSWGroup cluster : groupsByWeightLevel.get(l)) {
                 HashSet<HCSWRouter> nodes = cluster.routers;
-                float largestMean = 0.0f;
-                HCSWRouter largestNode = null;
+                SortedMap<Float, HCSWRouter> values = new TreeMap<>();
                 for (HCSWRouter node : nodes) {
-                    float mean = 0.0f;
-                    for (HCSWRouter other : nodes) {
-                        mean += node.meetCount(other);
+                    if (centerNodes.contains(node)) {
+                        continue;
                     }
-                    mean /= nodes.size();
-                    if (mean > largestMean) {
-                        largestNode = node;
-                        largestMean = mean;
-                    }
+                    values.put(peakNode.apply(new Pair<>(node, nodes)), node);
                 }
 
-                if (largestNode != null) {
-                    centerNodes.add(largestNode);
+                HCSWRouter selectedNode = null;
+                if (peakNodeByAscending) {
+                    selectedNode = values.get(values.lastKey());
+                } else {
+                    selectedNode = values.get(values.firstKey());
+                }
+
+                if (selectedNode != null) {
+                    centerNodes.add(selectedNode);
                     if (centerNodes.size() >= centerNodeCount) {
                         break loopForLevels;
                     }
@@ -174,6 +175,18 @@ public class HCSWRouter extends ActiveRouter {
 
         Settings routerSetting = new Settings(HCSW_NS);
         centerNodeCount = routerSetting.getInt("centerNodeCount", centerNodeCount);
+        switch (routerSetting.getSetting("centerNodeMethod")) {
+            case "mean":
+            peakNode = arg -> {
+                float mean = 0.0f;
+                for (HCSWRouter other : arg.second) {
+                    mean += arg.first.meetCount(other);
+                }
+                mean /= arg.second.size();
+                return mean;
+            };
+        }
+        peakNodeByAscending = routerSetting.getBoolean("centerNodeMethodAscending");
     }
 
     protected HCSWRouter(ActiveRouter r) {
