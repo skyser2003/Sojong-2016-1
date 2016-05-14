@@ -35,6 +35,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 	private boolean isCenter = false;
 
 	static void warmUpEnd() {
+		// Remove invalid router
 		ArrayList<DistributedSetCoverRouter> removeList = new ArrayList<>();
 		ArrayList<DistributedSetCoverRouter> copyList = new ArrayList<>(routerList);
 
@@ -50,6 +51,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		routerList.removeAll(removeList);
 		copyList.remove(removeList);
 
+		// Select center node
 		ArrayList<DistributedSetCoverRouter> centerList = new ArrayList<>();
 
 		while (copyList.size() != 0 && centerList.size() < centerNodeCount) {
@@ -142,6 +144,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 			return;
 		}
 
+		// Search for one random router
 		int randIndex = (int) (Math.random() * connections.size());
 		Connection otherCon = connections.get(randIndex);
 		DTNHost other = otherCon.getOtherNode(getHost());
@@ -157,6 +160,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		Collection<Message> msgCollection = getMessageCollection();
 		List<Message> randMsgList = new ArrayList<>();
 
+		// Select messages that 'other' did not receive yet & did not start from 'other'
 		for (Message msg : msgCollection) {
 			if (msg.getId().contains(other.getAddress() + "-") == true) {
 				continue;
@@ -173,11 +177,13 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 			return;
 		}
 
+		// Select one of the random messages and pass to 'other'
 		Message randMsg = randMsgList.get((int) (Math.random() * randMsgList.size()));
 
 		List<Tuple<Message, Connection>> messages = new ArrayList<Tuple<Message, Connection>>();
 		messages.add(new Tuple<>(randMsg, otherCon));
 
+		// If successfully passed, remove message from this
 		Tuple<Message, Connection> ret = tryMessagesForConnected(messages);
 		if (ret != null) {
 			removeFromMessages(randMsg.getId());
