@@ -39,8 +39,6 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 	static void warmUpEnd() {
 		// Remove invalid router
 		ArrayList<DistributedSetCoverRouter> removeList = new ArrayList<>();
-		// V' in paper
-		ArrayList<DistributedSetCoverRouter> copyList = new ArrayList<>(routerList);
 
 		for (DistributedSetCoverRouter router : routerList) {
 			if (router.getHost() == null) {
@@ -52,7 +50,9 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		}
 
 		routerList.removeAll(removeList);
-		copyList.removeAll(removeList);
+
+        // V' in paper
+        ArrayList<DistributedSetCoverRouter> copyList = new ArrayList<>(routerList);
 
 		// Select center node
 		ArrayList<DistributedSetCoverRouter> centerList = new ArrayList<>();
