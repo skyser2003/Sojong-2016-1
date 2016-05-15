@@ -19,8 +19,6 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 	private static boolean warmUpEnded = false;
 	private static int centerNodeCount = 10;
 
-	// TTL
-	static int messageTtl = 600;
 	static private ArrayList<DistributedSetCoverRouter> routerList = new ArrayList<>();
 
 	static private int cooltime = 300;
@@ -31,7 +29,6 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 	private int totalWeight = 0;
 
 	private boolean isInitialized = false;
-	private int currentDelay = cooltime;
 	private int nextGenTime = 0;
 	private int messageSentCount = 0;
 	private boolean isCenter = false;
