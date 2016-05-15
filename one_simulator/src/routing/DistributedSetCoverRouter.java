@@ -19,11 +19,13 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 	static boolean warmUpEnded = false;
 	static int centerNodeCount = 10;
 
+	// TTL
 	static int messageTtl = 600;
 	static private ArrayList<DistributedSetCoverRouter> routerList = new ArrayList<>();
 
 	static private int cooltime = 300;
 
+	// large gamma()
 	private ArrayList<DistributedSetCoverRouter> receivedList = new ArrayList<>();
 	private HashMap<DTNHost, Integer> msgWeight = new HashMap<>();
 	private int totalWeight = 0;
@@ -37,6 +39,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 	static void warmUpEnd() {
 		// Remove invalid router
 		ArrayList<DistributedSetCoverRouter> removeList = new ArrayList<>();
+		// V' in paper
 		ArrayList<DistributedSetCoverRouter> copyList = new ArrayList<>(routerList);
 
 		for (DistributedSetCoverRouter router : routerList) {
@@ -55,15 +58,18 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		ArrayList<DistributedSetCoverRouter> centerList = new ArrayList<>();
 
 		while (copyList.size() != 0 && centerList.size() < centerNodeCount) {
+			// u in paper(Identifying the k-node Set)
 			DistributedSetCoverRouter maxRouter = null;
 			int maxCount = -1;
 
 			for (DistributedSetCoverRouter router : routerList) {
+				// already center node - ignore
 				if (centerList.contains(router) == true) {
 					continue;
 				}
 
 				int localCount = 0;
+				// count intersection nodes
 				for (DistributedSetCoverRouter other : router.receivedList) {
 					if (copyList.contains(other) == true) {
 						++localCount;
@@ -76,7 +82,12 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 				}
 			}
 
-			copyList.removeAll(maxRouter.receivedList);
+            // wth... no max router? U mad?
+            assert maxRouter != null;
+
+			// remove gamma(u) and u from V'
+			copyList.remove(maxRouter);
+            copyList.removeAll(maxRouter.receivedList);
 			centerList.add(maxRouter);
 		}
 
@@ -162,10 +173,12 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 
 		// Select messages that 'other' did not receive yet & did not start from 'other'
 		for (Message msg : msgCollection) {
+			// check msg generated node != other
 			if (msg.getId().contains(other.getAddress() + "-") == true) {
 				continue;
 			}
 
+			// check last relay node != other
 			if (msg.getHops().get(msg.getHopCount()) == other) {
 				continue;
 			}
@@ -197,7 +210,8 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		if (recvCheck == RCV_OK) {
 			if (isWarmUp() == true) {
 				if (msgTtl <= 0) {
-
+                    // quit
+                    return recvCheck;
 				} else {
 					msgTtl -= msgWeight.get(from);
 					receivedList.add((DistributedSetCoverRouter) from.getRouter());
@@ -238,6 +252,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		}
 
 		if (isWarmUp() == true) {
+			 // generation is over, create message
 			if (nextGenTime <= SimClock.getIntTime()) {
 				while (nextGenTime <= SimClock.getIntTime()) {
 					nextGenTime += cooltime;
@@ -246,6 +261,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 				createMessage();
 			}
 
+			//
 			trySelfAlgorithm();
 		} else {
 			tryAllMessagesToAllConnections();
