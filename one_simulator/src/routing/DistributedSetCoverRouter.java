@@ -13,11 +13,11 @@ import core.SimClock;
 import util.Tuple;
 
 public class DistributedSetCoverRouter extends ActiveRouter {
-    public static final String DISTRIBUTEDSETCOVER_NS = "DistributedSetCoverRouter";
+    private static final String DISTRIBUTEDSETCOVER_NS = "DistributedSetCoverRouter";
 
-	static int warmupTime = 0;
-	static boolean warmUpEnded = false;
-	static int centerNodeCount = 10;
+	private static int warmupTime = 0;
+	private static boolean warmUpEnded = false;
+	private static int centerNodeCount = 10;
 
 	// TTL
 	static int messageTtl = 600;
@@ -36,7 +36,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 	private int messageSentCount = 0;
 	private boolean isCenter = false;
 
-	static void warmUpEnd() {
+	private static void warmUpEnd() {
 		// Remove invalid router
 		ArrayList<DistributedSetCoverRouter> removeList = new ArrayList<>();
 
@@ -64,14 +64,14 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 
 			for (DistributedSetCoverRouter router : routerList) {
 				// already center node - ignore
-				if (centerList.contains(router) == true) {
+				if (centerList.contains(router)) {
 					continue;
 				}
 
 				int localCount = 0;
 				// count intersection nodes
 				for (DistributedSetCoverRouter other : router.receivedList) {
-					if (copyList.contains(other) == true) {
+					if (copyList.contains(other)) {
 						++localCount;
 					}
 				}
@@ -174,7 +174,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		// Select messages that 'other' did not receive yet & did not start from 'other'
 		for (Message msg : msgCollection) {
 			// check msg generated node != other
-			if (msg.getId().contains(other.getAddress() + "-") == true) {
+			if (msg.getId().contains(other.getAddress() + "-")) {
 				continue;
 			}
 
@@ -193,7 +193,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		// Select one of the random messages and pass to 'other'
 		Message randMsg = randMsgList.get((int) (Math.random() * randMsgList.size()));
 
-		List<Tuple<Message, Connection>> messages = new ArrayList<Tuple<Message, Connection>>();
+		List<Tuple<Message, Connection>> messages = new ArrayList<>();
 		messages.add(new Tuple<>(randMsg, otherCon));
 
 		// If successfully passed, remove message from this
@@ -208,7 +208,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		int recvCheck = super.checkReceiving(m, from);
 
 		if (recvCheck == RCV_OK) {
-			if (isWarmUp() == true) {
+			if (isWarmUp()) {
 				if (msgTtl <= 0) {
                     // quit
                     return recvCheck;
@@ -233,12 +233,12 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 	public void update() {
 		super.update();
 
-		if (isInitialized == false) {
+		if (!isInitialized) {
 			isInitialized = true;
 			initialize();
 		}
 
-		if (warmUpEnded == false && isWarmUp() == false) {
+		if (!warmUpEnded && !isWarmUp()) {
 			warmUpEnded = true;
 			warmUpEnd();
 		}
@@ -251,7 +251,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 			return;
 		}
 
-		if (isWarmUp() == true) {
+		if (isWarmUp()) {
 			 // generation is over, create message
 			if (nextGenTime <= SimClock.getIntTime()) {
 				while (nextGenTime <= SimClock.getIntTime()) {
