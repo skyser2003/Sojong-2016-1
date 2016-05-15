@@ -130,6 +130,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 				continue;
 			}
 
+            // set t_uv (TTL for u, v)
 			int weight = 1 + (int) (Math.random() * 100);
 			msgWeight.put(other.getHost(), weight);
 			totalWeight += weight;
