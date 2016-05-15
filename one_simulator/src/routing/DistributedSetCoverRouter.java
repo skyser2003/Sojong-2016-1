@@ -52,7 +52,7 @@ public class DistributedSetCoverRouter extends ActiveRouter {
 		}
 
 		routerList.removeAll(removeList);
-		copyList.remove(removeList);
+		copyList.removeAll(removeList);
 
 		// Select center node
 		ArrayList<DistributedSetCoverRouter> centerList = new ArrayList<>();
