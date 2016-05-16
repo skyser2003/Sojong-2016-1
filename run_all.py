@@ -31,12 +31,12 @@ def get_sim_name(setting):
                 return line.strip()[len('Scenario.name = '):]
 
 
-def run(n, count, setting):
+def run(n, node_count, count, setting):
     random.seed()
     seed = str(random.randint(1, 100))
     print "Run : {0} ({1}/{2})".format(setting, n, count)
     pp = subprocess.Popen(default_args + ['-b', "{0}:{1}".format(n, count), seed,
-                                          'general_settings.txt', setting])
+                                          'general_settings_%d.txt' % node_count, setting])
     pp.wait()
 
 
@@ -72,6 +72,7 @@ def main():
                         help='do not plot')
     parser.add_argument('-r', dest='report', action='store_true',
                         help='parse report & plot only')
+    parser.add_argument('nodecount', type=int, help='node count')
     parser.add_argument('count', type=int, help='trial count')
     parser.add_argument('settings', type=str, nargs='*',
                         default=['setcover_settings.txt',
@@ -96,7 +97,8 @@ def main():
         pool = Pool(args.thread)
         for i in range(0, args.count):
             for setting in args.settings:
-                pool.apply_async(run, (i + 1, args.count, setting))
+                pool.apply_async(run,
+                                 (i + 1, args.nodecount, args.count, setting))
 
         pool.close()
         pool.join()
